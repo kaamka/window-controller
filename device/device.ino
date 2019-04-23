@@ -1,39 +1,34 @@
 /*
-File: RestServer.ino
-This example for the Arduino Uno WiFi shows how to access the digital and analog pins
-of the board through REST calls. It demonstrates how you can create your own API using
-REST style.
+  File: device.ino
+  Main code for smart window controler.
 
-Possible commands created in this shetch:
+  This example code is part of the public domain
 
-  "/arduino/digital/13"     -> digitalRead(13)
-  "/arduino/digital/13/1"   -> digitalWrite(13, HIGH)
-  "/arduino/analog/2/123"   -> analogWrite(2, 123)
-  "/arduino/analog/2"       -> analogRead(2)
-  "/arduino/mode/13/input"  -> pinMode(13, INPUT)
-  "/arduino/mode/13/output" -> pinMode(13, OUTPUT)
-
-This example code is part of the public domain
-
-Note: works only with Arduino Uno WiFi Developer Edition.
-
-http://www.arduino.org/learning/tutorials/boards-tutorials/restserver-and-restclient
+  Note: works only with Arduino Uno WiFi Developer Edition.
 */
 
 #include <Wire.h>
 #include <UnoWiFiDevEd.h>
 
+#define LED_RED 13
+#define LED_GREEN 12
+
+
+bool open = false;
 
 void setup() {
-    Wifi.begin();
-    Wifi.println("REST Server is up");
+  Wifi.begin();
+  Wifi.println("REST Server is up");
+
+  // set up led indicator
+  pinMode(LED_RED, OUTPUT);
 }
 
 void loop() {
 
-    while(Wifi.available()){
-      process(Wifi);
-    }
+  while (Wifi.available()) {
+    process(Wifi);
+  }
   delay(50);
 
 }
@@ -45,25 +40,72 @@ void process(WifiData client) {
   // is "digital" command?
   if (command == "digital") {
     String command2 = client.readStringUntil('/');
-    if (command2 == "hello") {
-
-      helloCommand(client);
+    if (command2 == "status") {
+      statusCommand(client);
     } else if (command2 == "setting") {
       settingCommand(client);
     } else if (command2 == "data") {
       dataCommand(client);
+    } else if (command2 == "open") {
+      openCommand(client);
+    } else if (command2 == "close") {
+      closeCommand(client);
+    } else {
+      client.println("HTTP/1.1 404 Not found\n");
     }
   }
 }
 
-void helloCommand(WifiData client) {
+void statusCommand(WifiData client) {
 
   // Send feedback to client
   client.println("HTTP/1.1 200 OK\n");
-  client.print("up");
+  if (open) {
+    client.print("open");
+  } else {
+    client.print("closed");
+  }
   client.print(EOL);    //char terminator
 
 }
+
+void openCommand(WifiData client) {
+  client.println("HTTP/1.1 200 OK\n");
+  if (!open) {
+    client.print("ok");
+    client.print(EOL);
+    moveActuator(LED_RED);
+    open = true;
+  } else {
+    client.print("was_open");
+    client.print(EOL);
+  }
+}
+
+void closeCommand(WifiData client) {
+  client.println("HTTP/1.1 200 OK\n");
+  if (open) {
+    client.print("ok");
+    client.print(EOL);
+    moveActuator(LED_GREEN);
+    open = false;
+  } else {
+    client.print("was_closed");
+    client.print(EOL);
+  }
+}
+
+
+
+void moveActuator(int led) {
+  for (int i = 0; i < 10; i++) {
+    digitalWrite(led, HIGH);
+    delay(500);
+    digitalWrite(led, LOW);
+    delay(500);
+  }
+}
+
 
 void settingCommand(WifiData client) {
 
