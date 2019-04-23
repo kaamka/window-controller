@@ -65,6 +65,8 @@ void statusCommand(WifiData client) {
   } else {
     client.println("closed");
   }
+  client.print(EOL);
+  
 
 }
 
