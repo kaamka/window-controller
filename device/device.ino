@@ -61,11 +61,10 @@ void statusCommand(WifiData client) {
   // Send feedback to client
   client.println("HTTP/1.1 200 OK\n");
   if (open) {
-    client.print("open");
+    client.println("open");
   } else {
-    client.print("closed");
+    client.println("closed");
   }
-  client.print(EOL);    //char terminator
 
 }
 
@@ -121,115 +120,39 @@ void dataCommand(WifiData client) {
 
   // Send feedback to client
   client.println("HTTP/1.1 200 OK\n");
-  client.print("data");
+  client.print("{");
+  client.print("\n\tgas: "); client.print(getSound());
+  client.print("\n\tsound: "); client.print(getSound());
+  client.print("\n\thumidity: "); client.print(getHumidity());
+  client.print("\n\ttemp: "); client.print(getTemp());
+  client.print("\n}");
   client.print(EOL);    //char terminator
 
 }
 
-
-
-
-void digitalCommand(WifiData client) {
-  int pin, value;
-
-  // Read pin number
-  pin = client.parseInt();
-
-  // If the next character is a '/' it means we have an URL
-  // with a value like: "/digital/13/1"
-  if (client.read() == '/') {
-    value = client.parseInt();
-    digitalWrite(pin, value);
-  }
-  else {
-    value = digitalRead(pin);
-  }
-
-  // Send feedback to client
-  client.println("HTTP/1.1 200 OK\n");
-  client.print("Pin D");
-  client.print(pin);
-  client.print(F(" set to "));
-  client.println(value);
-  client.print(EOL);    //char terminator
-
+int getGas() {
+  return 0;
 }
 
-void analogCommand(WifiData client) {
-  int pin, value;
 
-  // Read pin number
-  pin = client.parseInt();
-
-  // If the next character is a '/' it means we have an URL
-  // with a value like: "/analog/5/120"
-  if (client.read() == '/') {
-    // Read value and execute command
-    value = client.parseInt();
-    analogWrite(pin, value);
-
-    // Send feedback to client
-    client.println("HTTP/1.1 200 OK\n");
-    client.print(F("Pin D"));
-    client.print(pin);
-    client.print(F(" set to analog "));
-    client.println(value);
-    client.print(EOL);    //char terminator
-
-  }
-  else {
-    // Read analog pin
-    value = analogRead(pin);
-
-    // Send feedback to client
-    client.println("HTTP/1.1 200 OK\n");
-    client.print(F("Pin A"));
-    client.print(pin);
-    client.print(F(" reads analog "));
-    client.println(value);
-    client.print(EOL);    //char terminator
-
-  }
+int getHumidity() {
+  return 0;
 }
 
-void modeCommand(WifiData client) {
-  int pin;
 
-  // Read pin number
-  pin = client.parseInt();
-
-  // If the next character is not a '/' we have a malformed URL
-  if (client.read() != '/') {
-    client.println(F("error"));
-    client.print(EOL);    //char terminator
-    return;
-  }
-
-  String mode = client.readStringUntil('\r');
-
-  if (mode == "input") {
-    pinMode(pin, INPUT);
-    // Send feedback to client
-    client.println("HTTP/1.1 200 OK\n");
-    client.print(F("Pin D"));
-    client.print(pin);
-    client.println(F(" configured as INPUT!"));
-    client.print(EOL);    //char terminator
-    return;
-  }
-
-  if (mode == "output") {
-    pinMode(pin, OUTPUT);
-    // Send feedback to client
-    client.println("HTTP/1.1 200 OK\n");
-    client.print(F("Pin D"));
-    client.print(pin);
-    client.println(F(" configured as OUTPUT!"));
-    client.print(EOL);    //char terminator
-    return;
-  }
-
-  client.print(F("error: invalid mode "));
-  client.println(mode);
-  client.print(EOL);    //char terminator
+int getTemp() {
+  return 0;
 }
+
+
+int getSound() {
+  return 0;
+}
+
+/**
+ * Get int from a url
+ * client.parseInt();
+ * Read just one char
+ * client.read() == '/'
+ * Read string until the end
+ */
