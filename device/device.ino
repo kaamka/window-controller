@@ -20,6 +20,7 @@
 #define DHTTYPE DHT11   // DHT 11
 
 #define SMOKEPIN A0
+#define MICPIN A1
 
 #define LED_RED 13
 #define LED_GREEN 12
@@ -37,6 +38,9 @@ void setup() {
 
   // set up sensors
    dht.begin();
+
+   // set up serial for debugging
+   Serial.begin(57600);
 }
 
 void loop() {
@@ -138,6 +142,7 @@ void dataCommand(WifiData client) {
   float humidity =  dht.readHumidity();
   float temp = dht.readTemperature();
   int gas = analogRead(SMOKEPIN);
+  int sound = analogRead(MICPIN);
 
   if ( isnan(humidity) || isnan(temp) ){
     client.println("HTTP/1.1 500\n");
@@ -149,10 +154,10 @@ void dataCommand(WifiData client) {
   // Send feedback to client
   client.println("HTTP/1.1 200 OK\n");
   client.print("{");
-  client.print("\n\tgas: "); client.print(gas);
-  client.print("\n\tsound: "); client.print(getSound());
-  client.print("\n\thumidity: "); client.print(humidity);
-  client.print("\n\ttemp: "); client.print(temp);
+  client.print("\n\t\"gas\": "); client.print(gas);
+  client.print("\n\t\"sound\": "); client.print(sound);
+  client.print("\n\t\"humidity\": "); client.print(humidity);
+  client.print("\n\t\"temp\": "); client.print(temp);
   client.print("\n}");
   client.print(EOL);    //char terminator
 
