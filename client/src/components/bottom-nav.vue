@@ -3,12 +3,12 @@
     :active.sync="bottomNav"
     :value="true"
     fixed
-    @update:active="changed"
   >
     <v-btn
       color="teal"
       flat
       value="trasa"
+      :to="{name: 'home'}"
     >
       <span>Remote access</span>
       <v-icon>cloud</v-icon>
@@ -18,6 +18,7 @@
       color="teal"
       flat
       value="wars"
+      :to="{name: 'offline'}"
     >
       <span>Local access</span>
       <v-icon>home</v-icon>
@@ -27,6 +28,7 @@
       color="teal"
       flat
       value="media"
+      :to="{name: 'settings'}"
     >
       <span>Settings</span>
       <v-icon>settings</v-icon>
@@ -36,15 +38,11 @@
 
 <script>
   export default {
-    props: ['bottomNav'],
+    props: [],
     data () {
       return {
+        bottomNav: null
       }
     },
-    methods: {
-      changed (val) {
-        this.$emit('bottom-menu-change', val)
-      }
-    }
   }
 </script>
