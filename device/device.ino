@@ -142,8 +142,8 @@ void dataCommand(WifiData client) {
   float humidity =  dht.readHumidity();
   float temp = dht.readTemperature();
   int gas = analogRead(SMOKEPIN);
-  int sound = analogRead(MICPIN);
-
+  int sound = getSound();
+  
   if ( isnan(humidity) || isnan(temp) ){
     client.println("HTTP/1.1 500\n");
     client.println("Error reading humidity or temperature");
@@ -154,10 +154,10 @@ void dataCommand(WifiData client) {
   // Send feedback to client
   client.println("HTTP/1.1 200 OK\n");
   client.print("{");
-  client.print("\n\t\"gas\": "); client.print(gas);
-  client.print("\n\t\"sound\": "); client.print(sound);
-  client.print("\n\t\"humidity\": "); client.print(humidity);
-  client.print("\n\t\"temp\": "); client.print(temp);
+  client.print("\n\"gas\": "); client.print(gas);
+  client.print(",\n\"sound\": "); client.print(sound);
+  client.print(",\n\"humidity\": "); client.print(humidity);
+  client.print(",\n\"temp\": "); client.print(temp);
   client.print("\n}");
   client.print(EOL);    //char terminator
 
@@ -165,7 +165,13 @@ void dataCommand(WifiData client) {
 
 
 int getSound() {
-  return 0;
+  int sum = 0;
+  for (byte  i = 0; i < 50; i++)
+  {
+    sum += analogRead(MICPIN);
+    delay(1);
+  }
+  return - (sum/50 - 1000);
 }
 
 /**
