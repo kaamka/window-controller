@@ -6,16 +6,13 @@ function arduinoAPI() {
     if (localStorage.getItem('settings')) baseURL = JSON.parse(localStorage.getItem('settings')).arduinoUrl;
     return axios.create({
         baseURL: baseURL,
-        headers: {
-            'Content-Type': 'text/html'
-        },
         responseType: 'text'
     })
 }
 
 export const arduino = arduinoAPI
 
-function clodudAPI() {
+function cloudAPI() {
     let baseURL = 'http://192.168.5.18'
     if (localStorage.getItem('settings')) baseURL = JSON.parse(localStorage.getItem('settings')).arduinoUrl;
     return axios.create({
@@ -23,4 +20,4 @@ function clodudAPI() {
     })
 }
 
-export const cloud = clodudAPI
+export const cloud = cloudAPI

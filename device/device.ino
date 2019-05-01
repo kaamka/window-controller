@@ -24,6 +24,7 @@
 
 #define LED_RED 13
 #define LED_GREEN 12
+#define LED_BLUE 11
 
 
 bool open = false;
@@ -81,9 +82,9 @@ void statusCommand(WifiData client) {
   // Send feedback to client
   headers(client);
   if (open) {
-    client.println("open");
+    client.print("open");
   } else {
-    client.println("closed");
+    client.print("closed");
   }
   client.print(EOL);
 }
@@ -93,8 +94,8 @@ void openCommand(WifiData client) {
   if (!open) {
     client.print("ok");
     client.print(EOL);
-    moveActuator(LED_RED);
     open = true;
+    moveActuator(LED_BLUE);
   } else {
     client.print("was_open");
     client.print(EOL);
@@ -106,8 +107,8 @@ void closeCommand(WifiData client) {
   if (open) {
     client.print("ok");
     client.print(EOL);
-    moveActuator(LED_GREEN);
     open = false;
+    moveActuator(LED_RED);
   } else {
     client.print("was_closed");
     client.print(EOL);
@@ -119,9 +120,9 @@ void closeCommand(WifiData client) {
 void moveActuator(int led) {
   for (int i = 0; i < 10; i++) {
     digitalWrite(led, HIGH);
-    delay(500);
+    delay(200);
     digitalWrite(led, LOW);
-    delay(500);
+    delay(200);
   }
 }
 
@@ -161,9 +162,9 @@ void dataCommand(WifiData client) {
 
 
 void headers(WifiData client) {
-  client.println("HTTP/1.1 200 OK");
-  client.println("Access-Control-Allow-Origin: *");
-  client.println();
+  client.print("HTTP/1.1 200 OK\n");
+  client.print("Access-Control-Allow-Origin: *\n");
+  client.print('\n');
 }
 
 
