@@ -55,7 +55,7 @@
 export default {
   data: () => ({
     settings: JSON.parse(localStorage.getItem('settings')) || {
-      arduinoUrl: 'http://192.168.5.18',
+      arduinoUrl: 'http://192.168.5.18/arduino/digital',
       cloudUrl: 'http://192.168.0.228:31535'
     },
     snackbar: false,

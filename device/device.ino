@@ -71,6 +71,7 @@ void process(WifiData client) {
       closeCommand(client);
     } else {
       client.println("HTTP/1.1 404 Not found\n");
+      client.print(EOL);
     }
   }
 }
@@ -78,19 +79,17 @@ void process(WifiData client) {
 void statusCommand(WifiData client) {
 
   // Send feedback to client
-  client.println("HTTP/1.1 200 OK\n");
+  headers(client);
   if (open) {
     client.println("open");
   } else {
     client.println("closed");
   }
   client.print(EOL);
-  
-
 }
 
 void openCommand(WifiData client) {
-  client.println("HTTP/1.1 200 OK\n");
+  headers(client);
   if (!open) {
     client.print("ok");
     client.print(EOL);
@@ -103,7 +102,7 @@ void openCommand(WifiData client) {
 }
 
 void closeCommand(WifiData client) {
-  client.println("HTTP/1.1 200 OK\n");
+  headers(client);
   if (open) {
     client.print("ok");
     client.print(EOL);
@@ -130,10 +129,9 @@ void moveActuator(int led) {
 void settingCommand(WifiData client) {
 
   // Send feedback to client
-  client.println("HTTP/1.1 200 OK\n");
+  headers(client);
   client.print("setting");
   client.print(EOL);    //char terminator
-
 }
 
 
@@ -152,15 +150,20 @@ void dataCommand(WifiData client) {
   }
   
   // Send feedback to client
-  client.println("HTTP/1.1 200 OK\n");
-  client.print("{");
-  client.print("\n\"gas\": "); client.print(gas);
-  client.print(",\n\"sound\": "); client.print(sound);
-  client.print(",\n\"humidity\": "); client.print(humidity);
-  client.print(",\n\"temp\": "); client.print(temp);
-  client.print("\n}");
-  client.print(EOL);    //char terminator
+  headers(client);
+  client.print(gas);
+  client.print(","); client.print(sound);
+  client.print(","); client.print(humidity);
+  client.print(","); client.print(temp);
+  client.print(EOL);
 
+}
+
+
+void headers(WifiData client) {
+  client.println("HTTP/1.1 200 OK");
+  client.println("Access-Control-Allow-Origin: *");
+  client.println();
 }
 
 
