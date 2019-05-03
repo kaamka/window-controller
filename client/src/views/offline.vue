@@ -60,7 +60,7 @@
         </v-card-text>
       </v-card>
     </v-dialog>
-    <v-snackbar v-model="snackbar" :bottom="true" :timeout="5000">
+    <v-snackbar v-model="snackbar" :multi-line="true" :bottom="true" :timeout="5000">
       {{ sbText }}
       <v-btn color="pink" flat @click="snackbar = false">Close</v-btn>
     </v-snackbar>
@@ -93,13 +93,24 @@ export default {
   methods: {
     async refresh() {
       try {
-        let status = await timeout(5000, arduino.status())
+        let status = await timeout(20000, arduino.status())
         this.status = status.data;
-        
-        let data = await arduino.data();
+      } catch (e) {
+
+        this.snackbar = true
+        this.sbText = 'Connection problem (status), retrying. ' + e.message // e.config + Object.keys(e)
+        setTimeout(this.refresh, 5000);
+        return
+
+      }
+      try {
+        let data = await timeout(15000, arduino.data())
         this.data = data;
       } catch (e) {
-        this.refresh()
+        this.snackbar = true
+        this.sbText = 'Connection problem (data), retrying. ' + e.message
+        setTimeout(this.refresh, 5000);
+        return
       }
     },
     async open() {

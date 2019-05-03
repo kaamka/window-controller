@@ -148,13 +148,14 @@ void dataCommand(WifiData client) {
     client.println("Error reading humidity or temperature");
     client.print(EOL); 
     return;
+    Wifi.println("DHT error");
   }
   
   // Send feedback to client
   headers(client);
   client.print(gas);
   client.print(","); client.print(sound);
-  client.print(","); client.print(humidity);
+  client.print(","); client.print((int)humidity);
   client.print(","); client.print(temp);
   client.print(EOL);
 
@@ -162,8 +163,9 @@ void dataCommand(WifiData client) {
 
 
 void headers(WifiData client) {
-  client.print("HTTP/1.1 200 OK\n");
-  client.print("Access-Control-Allow-Origin: *\n");
+  client.print("HTTP/1.1 200 -\n");
+  client.print("Access-Control-Allow-Origin:*\n");
+  client.print("Connection:close\n");
   client.print('\n');
 }
 
