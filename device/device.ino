@@ -24,6 +24,7 @@
 
 #define LED_RED 13
 #define LED_GREEN 12
+#define LED_BLUE 11
 
 
 bool open = false;
@@ -71,6 +72,7 @@ void process(WifiData client) {
       closeCommand(client);
     } else {
       client.println("HTTP/1.1 404 Not found\n");
+      client.print(EOL);
     }
   }
 }
@@ -78,24 +80,22 @@ void process(WifiData client) {
 void statusCommand(WifiData client) {
 
   // Send feedback to client
-  client.println("HTTP/1.1 200 OK\n");
+  headers(client);
   if (open) {
-    client.println("open");
+    client.print("open");
   } else {
-    client.println("closed");
+    client.print("closed");
   }
   client.print(EOL);
-  
-
 }
 
 void openCommand(WifiData client) {
-  client.println("HTTP/1.1 200 OK\n");
+  headers(client);
   if (!open) {
     client.print("ok");
     client.print(EOL);
-    moveActuator(LED_RED);
     open = true;
+    moveActuator(LED_BLUE);
   } else {
     client.print("was_open");
     client.print(EOL);
@@ -103,12 +103,12 @@ void openCommand(WifiData client) {
 }
 
 void closeCommand(WifiData client) {
-  client.println("HTTP/1.1 200 OK\n");
+  headers(client);
   if (open) {
     client.print("ok");
     client.print(EOL);
-    moveActuator(LED_GREEN);
     open = false;
+    moveActuator(LED_RED);
   } else {
     client.print("was_closed");
     client.print(EOL);
@@ -120,9 +120,9 @@ void closeCommand(WifiData client) {
 void moveActuator(int led) {
   for (int i = 0; i < 10; i++) {
     digitalWrite(led, HIGH);
-    delay(500);
+    delay(200);
     digitalWrite(led, LOW);
-    delay(500);
+    delay(200);
   }
 }
 
@@ -130,10 +130,9 @@ void moveActuator(int led) {
 void settingCommand(WifiData client) {
 
   // Send feedback to client
-  client.println("HTTP/1.1 200 OK\n");
+  headers(client);
   client.print("setting");
   client.print(EOL);    //char terminator
-
 }
 
 
@@ -149,18 +148,25 @@ void dataCommand(WifiData client) {
     client.println("Error reading humidity or temperature");
     client.print(EOL); 
     return;
+    Wifi.println("DHT error");
   }
   
   // Send feedback to client
-  client.println("HTTP/1.1 200 OK\n");
-  client.print("{");
-  client.print("\n\"gas\": "); client.print(gas);
-  client.print(",\n\"sound\": "); client.print(sound);
-  client.print(",\n\"humidity\": "); client.print(humidity);
-  client.print(",\n\"temp\": "); client.print(temp);
-  client.print("\n}");
-  client.print(EOL);    //char terminator
+  headers(client);
+  client.print(gas);
+  client.print(","); client.print(sound);
+  client.print(","); client.print((int)humidity);
+  client.print(","); client.print(temp);
+  client.print(EOL);
 
+}
+
+
+void headers(WifiData client) {
+  client.print("HTTP/1.1 200 -\n");
+  client.print("Access-Control-Allow-Origin:*\n");
+  client.print("Connection:close\n");
+  client.print('\n');
 }
 
 
