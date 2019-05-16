@@ -1,1 +1,4 @@
 envapi/
+__pycache__/
+db.sqlite
+arduino_status.json

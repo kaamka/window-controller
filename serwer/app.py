@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, logging
 from flask_sqlalchemy import SQLAlchemy 
 from flask_marshmallow import Marshmallow 
 import os
+import datetime
 
 # Init app
 app = Flask(__name__)
@@ -15,27 +16,31 @@ db = SQLAlchemy(app)
 ma = Marshmallow(app)
 
 # Product Class/Model
-class Product(db.Model):
+class SensorsData(db.Model):
   id = db.Column(db.Integer, primary_key=True)
-  name = db.Column(db.String(100), unique=True)
-  description = db.Column(db.String(200))
-  price = db.Column(db.Float)
-  qty = db.Column(db.Integer)
+  time = db.Column(db.DateTime, default=datetime.datetime.now())
+  temp= db.Column(db.Float)
+  hum = db.Column(db.Integer)
+  sound = db.Column(db.Integer)
+  gas = db.Column(db.Integer)
+  open_status = db.Column(db.Boolean)
 
-  def __init__(self, name, description, price, qty):
-    self.name = name
-    self.description = description
-    self.price = price
-    self.qty = qty
+  def __init__(self, temp, hum, sound, gas, open_status):
+    self.temp = temp
+    self.hum = hum
+    self.sound = sound
+    self.gas = gas
+    self.open_status = open_status
 
-# Product Schema
-class ProductSchema(ma.Schema):
+
+# Sensor data Schema
+class SensorsDataSchema(ma.Schema):
   class Meta:
-    fields = ('id', 'name', 'description', 'price', 'qty')
+    fields = ('id', 'time', 'temp', 'hum', 'sound', 'gas', 'open_status')
 
 # Init schema
-product_schema = ProductSchema(strict=True)
-products_schema = ProductSchema(many=True, strict=True)
+sensors_data_schema = SensorsDataSchema(strict=True)
+sensors_history_schema = SensorsDataSchema(many=True, strict=True)
 
 
 # Home
@@ -43,26 +48,28 @@ products_schema = ProductSchema(many=True, strict=True)
 def hello():
     return jsonify({'msg': 'Hello Arduino'})
 
-# Create a Product
-@app.route('/product', methods=['POST'])
-def add_product():
-  name = request.json['name']
-  description = request.json['description']
-  price = request.json['price']
-  qty = request.json['qty']
+# Add the data
+@app.route('/newdata', methods=['POST'])
+def add_data():
+  temp = request.json['temp']
+  hum = request.json['hum']
+  sound = request.json['sound']
+  gas = request.json['gas']
+  open_status = request.json['open_status']
 
-  new_product = Product(name, description, price, qty)
+  new_data = SensorsData(temp, hum, sound, gas, open_status)
 
-  db.session.add(new_product)
+  db.session.add(new_data)
   db.session.commit()
 
-  return product_schema.jsonify(new_product)
+  return sensors_data_schema.jsonify(new_data)
 
-# Get All Products
-@app.route('/product', methods=['GET'])
+'''
+# Get History
+@app.route('/history', methods=['GET'])
 def get_products():
-  all_products = Product.query.all()
-  result = products_schema.dump(all_products)
+  history = SensorsData.query.all()
+  result = sensors_history_schema.dump(history)
   return jsonify(result.data)
 
 # Get Single Products
@@ -97,6 +104,7 @@ def delete_product(id):
   db.session.delete(product)
   db.session.commit()
   return product_schema.jsonify(product)
+'''
 
 # Run server
 if __name__ == '__main__':
