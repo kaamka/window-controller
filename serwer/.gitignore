@@ -4,3 +4,4 @@ db.sqlite
 arduino_status.json
 devices.json
 user_settings.json
+control_humidity.json
