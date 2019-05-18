@@ -150,9 +150,24 @@ def open_request():
 
 # Change status to close
 @app.route('/close', methods=['GET'])
-def clsose_request():
+def close_request():
     arduino_response = requests.get(ARDUINO_CLOSE_REQUEST, timeout = timeout)
     return str(arduino_response.text)
+
+'''
+# Change mode to automatic
+@app.route('/mode/auto', methods=['GET'])
+def set_auto_mode():
+    arduino_response = requests.get(ARDUINO_AUTO_REQUEST, timeout = timeout)
+    return str(arduino_response.text)
+
+
+# Change mode to manual
+@app.route('/mode/manual', methods=['GET'])
+def set_manual_mode():
+    arduino_response = requests.get(ARDUINO_MANUAL_REQUEST, timeout = timeout)
+    return str(arduino_response.text)
+'''
 
 # Run server
 if __name__ == '__main__':
