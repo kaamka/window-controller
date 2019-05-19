@@ -24,12 +24,12 @@ db = SQLAlchemy(app)
 # Init ma
 ma = Marshmallow(app)
 
-'''
+
 # create a configured "Session" class
 Session = sessionmaker(bind=db)
 # create a Session
 session = Session()
-'''
+
 
 # SensorsData Class/Model
 class SensorsData(db.Model):
@@ -181,14 +181,22 @@ def delete_device_by_id(id):
   db.session.commit()
   return device_schema.jsonify(data)
 
-## Add device id
+
 # Get status
 @app.route('/data/latest/status/<device_id>', methods=['GET'])
 def get_status(device_id):
     last_record = SensorsData.query.filter_by(device_id = device_id).order_by(SensorsData.id.desc()).first()
     return str(last_record.open_status)
 
-## Add device id
+'''
+# Get the latest data of all devices
+@app.route('/data/latest', methods=['GET'])
+def get__all_latest_data():
+    data = session.query(Device.id).join(SensorsData.open_status)
+    return str(data.text)
+# Get the latest statuses of all devices
+'''
+
 # Get latest data
 @app.route('/data/latest/<device_id>', methods=['GET'])
 def get_latest_data(device_id):
@@ -213,6 +221,10 @@ def close_request(device_id):
     arduino_response = requests.get(url, timeout = timeout)
     return str(arduino_response.text)
 
+
+# Change status to close for all devices
+
+# Change status to close for all devices
 '''
 # Change mode to automatic
 @app.route('/mode/auto', methods=['GET'])
