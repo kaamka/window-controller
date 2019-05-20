@@ -19,13 +19,13 @@ MODE = 'automatic' # 'manual
 # Threasholds
 TEMP_LIMIT = 10.0 # close if < limit
 SOUND_LIMIT = 465 # close if > limit
-'''
+
 def close_request_by_limits(temp, sound):
     if ((temp <= TEMP_LIMIT) or (sound >= SOUND_LIMIT)):
         return "close"
     else:
         return None
-'''
+
 
 def parse_sensor_data(arduino_data, arduino_status):
     mydict = {}
@@ -45,6 +45,7 @@ if __name__ == '__main__':
         for device in devices:
             IP = device['ip_address']
             device_id = device['id']
+            #if (device_id==1):
             data = requests.get(IP+ARDUINO_DATA_GET, timeout = timeout)
             status = requests.get(IP+ARDUINO_STATUS_GET, timeout = timeout)
             new_data_dict = parse_sensor_data(data, status)
@@ -53,8 +54,8 @@ if __name__ == '__main__':
             print(new_data)
             new = requests.post(url = API_NEWDATA_POST, headers = headers, data = new_data)
             '''
-            if (MODE == "automatic"):
-                if (close_request_by_limits(new_data_dict['temp'], new_data_dict['sound']) is not None):
-                    requests.get(ARDUINO_CLOSE_REQUEST, timeout = timeout)
-        '''
+                if (MODE == "automatic"):
+                    if (close_request_by_limits(new_data_dict['temp'], new_data_dict['sound']) is not None):
+                        requests.get(IP+ARDUINO_CLOSE_REQUEST, timeout = timeout)
+            '''
         time.sleep(50)
