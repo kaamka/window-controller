@@ -242,4 +242,4 @@ def set_manual_mode():
 
 # Run server
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=os.getenv('FLASK_DEBUG', True), host='0.0.0.0')
