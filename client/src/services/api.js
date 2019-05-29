@@ -13,8 +13,8 @@ function arduinoAPI() {
 export const arduino = arduinoAPI
 
 function cloudAPI() {
-    let baseURL = 'http://192.168.5.18'
-    if (localStorage.getItem('settings')) baseURL = JSON.parse(localStorage.getItem('settings')).arduinoUrl;
+    let baseURL = 'http://localhost:5000'
+    if (localStorage.getItem('settings')) baseURL = JSON.parse(localStorage.getItem('settings')).cloudUrl;
     return axios.create({
         baseURL: baseURL
     })

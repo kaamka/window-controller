@@ -12,6 +12,11 @@ import ControlScreen from '../components/control-screen.vue'
 
 
 export default {
+  data() {
+    return {
+      arduino: arduino
+    };
+  },
   components: {
     ControlScreen
   },

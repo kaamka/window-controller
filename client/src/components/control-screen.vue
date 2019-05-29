@@ -102,7 +102,8 @@ export default {
         let status = await timeout(20000, this.api.status())
         this.status = status.data;
       } catch (e) {
-
+        // eslint-disable-next-line
+        console.log(e)
         this.snackbar = true
         this.sbText = 'Connection problem (status), retrying. ' + e.message // e.config + Object.keys(e)
         setTimeout(this.refresh, 5000);

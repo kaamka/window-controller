@@ -3,3 +3,4 @@ Flask-SQLAlchemy
 marshmallow-sqlalchemy
 flask-marshmallow
 requests
+flask-cors
