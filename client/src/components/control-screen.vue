@@ -68,7 +68,6 @@
 </template>
 
 <script>
-import arduino from "../services/arduino";
 import timeout from "../plugins/timeout"
 
 export default {
@@ -86,6 +85,13 @@ export default {
       sbText: ""
     };
   },
+  props: {
+    online: {
+      type: Boolean,
+      default: false
+    },
+    api: Object
+  },
   components: {},
   async mounted() {
     this.refresh();
@@ -93,7 +99,7 @@ export default {
   methods: {
     async refresh() {
       try {
-        let status = await timeout(20000, arduino.status())
+        let status = await timeout(20000, this.api.status())
         this.status = status.data;
       } catch (e) {
 
@@ -104,7 +110,7 @@ export default {
 
       }
       try {
-        let data = await timeout(15000, arduino.data())
+        let data = await timeout(15000, this.api.data())
         this.data = data;
       } catch (e) {
         this.snackbar = true
@@ -114,10 +120,10 @@ export default {
       }
     },
     async open() {
-      this.moveWindow(arduino.open, 'open', this.open)
+      this.moveWindow(this.api.open, 'open', this.open)
     },
     async close() {
-      this.moveWindow(arduino.close, 'closed', this.close)
+      this.moveWindow(this.api.close, 'closed', this.close)
     },
     async moveWindow(handler, type, caller) {
       this.dialog = true;

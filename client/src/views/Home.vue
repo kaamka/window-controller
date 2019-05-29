@@ -1,23 +1,17 @@
 <template>
   <v-container>
-    <v-layout
-      wrap
-    >
-      <v-flex xs12>
-        <v-subheader>O aplikacji</v-subheader>
-        <v-card>
-          <v-card-title primary-title>
-            Test
-          </v-card-title>
-        </v-card>
-      </v-flex>
-    </v-layout>
+    <v-subheader>Online mode</v-subheader>
+    <control-screen></control-screen>
   </v-container>
 </template>
 
 <script>
-  export default {
-    components: {
-    }
-  }
+import ControlScreen from '../components/control-screen.vue'
+
+
+export default {
+  components: {
+    ControlScreen
+  },
+};
 </script>
