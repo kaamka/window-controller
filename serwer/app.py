@@ -1,10 +1,12 @@
 from flask import Flask, request, jsonify, logging
 from flask_sqlalchemy import SQLAlchemy 
-from flask_marshmallow import Marshmallow 
+from flask_marshmallow import Marshmallow
+from flask_cors import CORS
 import os
 import datetime
 import requests
 from sqlalchemy.orm import sessionmaker
+import logging
 
 ARDUINO = 'http://192.168.5.18'
 ARDUINO_DATA_GET = '/arduino/digital/data'
@@ -15,6 +17,7 @@ timeout = 10
 
 # Init app
 app = Flask(__name__)
+CORS(app)
 basedir = os.path.abspath(os.path.dirname(__file__))
 # Database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'db.sqlite')
@@ -119,6 +122,13 @@ def add_data():
   return sensors_data_schema.jsonify(new_data)
 
 
+@app.route('/status', methods=['GET'])
+def status():
+  """Status of the last queried device"""
+  history = SensorsData.query.order_by(SensorsData.time.desc()).first()
+  return history.open_status
+
+
 # Get History
 @app.route('/data/all', methods=['GET'])
 def get_history():
@@ -188,14 +198,12 @@ def get_status(device_id):
     last_record = SensorsData.query.filter_by(device_id = device_id).order_by(SensorsData.id.desc()).first()
     return str(last_record.open_status)
 
-'''
-# Get the latest data of all devices
-@app.route('/data/latest', methods=['GET'])
-def get__all_latest_data():
-    data = session.query(Device.id).join(SensorsData.open_status)
-    return str(data.text)
-# Get the latest statuses of all devices
-'''
+
+@app.route('/data', methods=['GET'])
+def get_global_latest_data():
+    data = SensorsData.query.order_by(SensorsData.id.desc()).first()
+    return ','.join([str(dat) for dat in [data.gas, data.sound, data.hum, data.temp]])
+
 
 # Get latest data
 @app.route('/data/latest/<device_id>', methods=['GET'])
@@ -242,4 +250,4 @@ def set_manual_mode():
 
 # Run server
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=os.getenv('FLASK_DEBUG', True), host='0.0.0.0')
