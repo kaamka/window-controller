@@ -2,6 +2,7 @@
   "name": "window-controller",
   "version": "0.1.0",
   "private": true,
+  "module": "vue/dist/vue.esm.js",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
@@ -15,6 +16,7 @@
     "register-service-worker": "^1.6.2",
     "roboto-fontface": "*",
     "vue": "^2.6.10",
+    "vue-graph": "^0.8.4",
     "vue-router": "^3.0.3",
     "vuetify": "^1.5.5"
   },

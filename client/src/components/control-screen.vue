@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <v-container pb-5>
     <v-layout wrap>
       <v-flex xs12>
         <v-subheader>Controls</v-subheader>
@@ -52,7 +52,7 @@
         </v-card>
       </v-flex>
 
-      <v-flex xs12 v-if="online" pb-5>
+      <v-flex xs12 v-if="online">
         <v-subheader>Historic data</v-subheader>
         <v-data-table
           :headers="headers"
@@ -81,6 +81,28 @@
         </v-data-table>
       </v-flex>
     </v-layout>
+    <template v-if="charts">
+      <v-flex xs12 v-for="(chart, i) in charts" :key="i">
+        <v-subheader>{{ chart.name }}</v-subheader>
+        <v-card>
+          <v-card-text>
+            <graph-line-timerange
+              :height="400"
+              :axis-min="0"
+              :axis-max="chart.maxc"
+              :axis-reverse="false"
+              :axis-format="'HH:mm'"
+              :axis-interval="1000 * 60 * 60 * 8"
+              :labels="chart.labels"
+              :values="chart.values"
+            >
+              <note :text="chart.name"></note>
+              <guideline :tooltip-x="true" :tooltip-y="true"></guideline>
+            </graph-line-timerange>
+          </v-card-text>
+        </v-card>
+      </v-flex>
+    </template>
     <v-dialog v-model="dialog" hide-overlay persistent width="300">
       <v-card color="primary" dark>
         <v-card-text>
@@ -116,17 +138,18 @@ export default {
       headers: [
         // { text: "id", value: "id" },
         // { text: "device_id", value: "device_id" },
-        { text: "time", value: "time" },
-        { text: "hum", value: "hum" },
-        { text: "temp", value: "temp" },
-        { text: "gas", value: "gas" },
-        { text: "sound", value: "sound" },
-        { text: "open_status", value: "open_status" }
+        { text: "Time", value: "time" },
+        { text: "Humidity", value: "hum" },
+        { text: "Temperature", value: "temp" },
+        { text: "Gas level", value: "gas" },
+        { text: "Sound Level", value: "sound" },
+        { text: "Status", value: "open_status" }
       ],
       pagination: {
         descending: true,
-        sortBy: 'time',
-      }
+        sortBy: "time"
+      },
+      charts: false
     };
   },
   props: {
@@ -164,6 +187,7 @@ export default {
       }
 
       this.allData = (await this.api.allData()).data;
+      this.prepareCharts();
     },
     async open() {
       this.moveWindow(this.api.open, "open", this.open);
@@ -192,6 +216,34 @@ export default {
         console.log("Retrying opening");
         caller();
       });
+    },
+    prepareCharts() {
+      let charts = [];
+      let min = new Date(
+        this.allData.reduce(function(prev, curr) {
+          return prev.time < curr.time ? prev : curr;
+        }).time
+      );
+      let max = new Date(
+        this.allData.reduce(function(prev, curr) {
+          return prev.time > curr.time ? prev : curr;
+        }).time
+      );
+      for (let col of this.headers) {
+        if (col.value == "open_status" || col.value == "time") continue;
+        let vals = this.allData.map(el => [new Date(el.time), el[col.value]]);
+        let maxc = this.allData.reduce(function(prev, curr) {
+            return prev[col.value] > curr[col.value] ? prev : curr;
+          })[col.value]
+
+        charts.push({
+          name: col.text,
+          values: vals,
+          labels: [min, max],
+          maxc
+        });
+      }
+      this.charts = charts;
     }
   }
 };
