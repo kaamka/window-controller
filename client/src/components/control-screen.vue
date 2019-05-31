@@ -70,13 +70,13 @@
           </template>
           <template v-slot:items="props">
             <!-- <td class="text-xs-right">{{ props.item.id }}</td>
-            <td class="text-xs-right">{{ props.item.device_id }}</td>-->
-            <td class="text-xs-right">{{ new Date(props.item.time) }}</td>
-            <td class="text-xs-right">{{ props.item.hum }}</td>
-            <td class="text-xs-right">{{ props.item.temp }}</td>
-            <td class="text-xs-right">{{ props.item.gas }}</td>
-            <td class="text-xs-right">{{ props.item.sound }}</td>
-            <td class="text-xs-right">{{ props.item.open_status }}</td>
+            <td class="text-xs-center">{{ props.item.device_id }}</td>-->
+            <td class="text-xs-center">{{ new Date(props.item.time).toLocaleString() }}</td>
+            <td class="text-xs-center">{{ props.item.hum }}</td>
+            <td class="text-xs-center">{{ props.item.temp }}</td>
+            <td class="text-xs-center">{{ props.item.gas }}</td>
+            <td class="text-xs-center">{{ props.item.sound }}</td>
+            <td class="text-xs-center">{{ props.item.open_status }}</td>
           </template>
         </v-data-table>
       </v-flex>
@@ -87,7 +87,7 @@
         <v-card>
           <v-card-text>
             <graph-line-timerange
-              :height="400"
+              :height="200"
               :axis-min="0"
               :axis-max="chart.maxc"
               :axis-reverse="false"
@@ -138,12 +138,12 @@ export default {
       headers: [
         // { text: "id", value: "id" },
         // { text: "device_id", value: "device_id" },
-        { text: "Time", value: "time" },
-        { text: "Humidity", value: "hum" },
-        { text: "Temperature", value: "temp" },
-        { text: "Gas level", value: "gas" },
-        { text: "Sound Level", value: "sound" },
-        { text: "Status", value: "open_status" }
+        { text: "Time", value: "time", align: "center" },
+        { text: "Humidity", value: "hum", align: "center" },
+        { text: "Temperature", value: "temp", align: "center" },
+        { text: "Gas level", value: "gas", align: "center" },
+        { text: "Sound Level", value: "sound", align: "center" },
+        { text: "Status", value: "open_status", align: "center" }
       ],
       pagination: {
         descending: true,
