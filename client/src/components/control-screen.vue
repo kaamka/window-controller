@@ -51,6 +51,35 @@
           </v-card-text>
         </v-card>
       </v-flex>
+
+      <v-flex xs12 v-if="online" pb-5>
+        <v-subheader>Historic data</v-subheader>
+        <v-data-table
+          :headers="headers"
+          :pagination.sync="pagination"
+          :items="allData"
+          class="elevation-1"
+        >
+          <template slot="headerCell" slot-scope="props">
+            <v-tooltip bottom>
+              <template v-slot:activator="{ on }">
+                <span v-on="on">{{ props.header.text }}</span>
+              </template>
+              <span>{{ props.header.text }}</span>
+            </v-tooltip>
+          </template>
+          <template v-slot:items="props">
+            <!-- <td class="text-xs-right">{{ props.item.id }}</td>
+            <td class="text-xs-right">{{ props.item.device_id }}</td>-->
+            <td class="text-xs-right">{{ new Date(props.item.time) }}</td>
+            <td class="text-xs-right">{{ props.item.hum }}</td>
+            <td class="text-xs-right">{{ props.item.temp }}</td>
+            <td class="text-xs-right">{{ props.item.gas }}</td>
+            <td class="text-xs-right">{{ props.item.sound }}</td>
+            <td class="text-xs-right">{{ props.item.open_status }}</td>
+          </template>
+        </v-data-table>
+      </v-flex>
     </v-layout>
     <v-dialog v-model="dialog" hide-overlay persistent width="300">
       <v-card color="primary" dark>
@@ -68,7 +97,7 @@
 </template>
 
 <script>
-import timeout from "../plugins/timeout"
+import timeout from "../plugins/timeout";
 
 export default {
   data() {
@@ -82,7 +111,22 @@ export default {
       },
       dialog: false,
       snackbar: false,
-      sbText: ""
+      sbText: "",
+      allData: [],
+      headers: [
+        // { text: "id", value: "id" },
+        // { text: "device_id", value: "device_id" },
+        { text: "time", value: "time" },
+        { text: "hum", value: "hum" },
+        { text: "temp", value: "temp" },
+        { text: "gas", value: "gas" },
+        { text: "sound", value: "sound" },
+        { text: "open_status", value: "open_status" }
+      ],
+      pagination: {
+        descending: true,
+        sortBy: 'time',
+      }
     };
   },
   props: {
@@ -99,54 +143,55 @@ export default {
   methods: {
     async refresh() {
       try {
-        let status = await timeout(20000, this.api.status())
+        let status = await timeout(20000, this.api.status());
         this.status = status.data;
       } catch (e) {
         // eslint-disable-next-line
-        console.log(e)
-        this.snackbar = true
-        this.sbText = 'Connection problem (status), retrying. ' + e.message // e.config + Object.keys(e)
+        console.log(e);
+        this.snackbar = true;
+        this.sbText = "Connection problem (status), retrying. " + e.message; // e.config + Object.keys(e)
         setTimeout(this.refresh, 5000);
-        return
-
+        return;
       }
       try {
-        let data = await timeout(15000, this.api.data())
+        let data = await timeout(15000, this.api.data());
         this.data = data;
       } catch (e) {
-        this.snackbar = true
-        this.sbText = 'Connection problem (data), retrying. ' + e.message
+        this.snackbar = true;
+        this.sbText = "Connection problem (data), retrying. " + e.message;
         setTimeout(this.refresh, 5000);
-        return
+        return;
       }
+
+      this.allData = (await this.api.allData()).data;
     },
     async open() {
-      this.moveWindow(this.api.open, 'open', this.open)
+      this.moveWindow(this.api.open, "open", this.open);
     },
     async close() {
-      this.moveWindow(this.api.close, 'closed', this.close)
+      this.moveWindow(this.api.close, "closed", this.close);
     },
     async moveWindow(handler, type, caller) {
       this.dialog = true;
-      let openPromise = timeout(7000, handler())
-      
+      let openPromise = timeout(7000, handler());
+
       openPromise.then(res => {
         let status = res.data;
         if (status == `was_${type}`) {
-          this.snackbar = true
-          this.sbText = `Window was ${type}`
+          this.snackbar = true;
+          this.sbText = `Window was ${type}`;
         } else {
-          this.status = type
+          this.status = type;
         }
-        this.dialog = false
+        this.dialog = false;
       });
 
       // eslint-disable-next-line
       openPromise.catch(_error => {
         // eslint-disable-next-line
-        console.log('Retrying opening')
-        caller()
-      })
+        console.log("Retrying opening");
+        caller();
+      });
     }
   }
 };

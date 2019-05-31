@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <v-subheader>Offline mode</v-subheader>
-    <control-screen :api="arduino"></control-screen>
+    <control-screen :api="arduino" :online="false"></control-screen>
   </v-container>
 </template>
 

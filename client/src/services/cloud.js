@@ -23,6 +23,9 @@ export default {
               temp: data[3]
           }
       })
-    }
+    },
+    allData () {
+      return api().get('data/all')
+    },
   }
   
