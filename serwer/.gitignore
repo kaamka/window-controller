@@ -5,3 +5,4 @@ arduino_status.json
 devices.json
 user_settings.json
 control_humidity.json
+get_weather_conds.py

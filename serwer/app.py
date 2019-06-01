@@ -186,10 +186,11 @@ def delete_data(id):
 # Delete device 
 @app.route('/devices/<id>', methods=['DELETE'])
 def delete_device_by_id(id):
-  data = Device.query.get(id)
-  db.session.delete(data)
+  #dv = Device.query.get(id)
+  Device.query.filter_by(id=id).delete()
+  # db.session.delete(dv)
   db.session.commit()
-  return device_schema.jsonify(data)
+  return device_schema.jsonify(Device.query.get(id))
 
 
 # Get status
