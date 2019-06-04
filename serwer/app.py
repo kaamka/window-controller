@@ -151,7 +151,7 @@ def get_data_by_id(id):
   return sensors_data_schema.jsonify(data)
 
 # Get All Devices
-@app.route('/devices/all', methods=['GET'])
+@app.route('/devices', methods=['GET'])
 def get_all_devices():
   devices = Device.query.all()
   result = all_devices_schema.dump(devices)
